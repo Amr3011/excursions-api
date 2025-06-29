@@ -1,6 +1,6 @@
 // src/models/nationality.js
 const sql = require("mssql");
-const { poolPromise } = require("../config/db");
+const db = require("../config/db");
 
 class Nationality {
   constructor(nationality) {
@@ -12,7 +12,7 @@ class Nationality {
   // الحصول على جميع الجنسيات
   static async getAll() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -34,7 +34,7 @@ class Nationality {
   // الحصول على جنسية واحدة بواسطة الكود
   static async findByCode(nationalityCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -62,7 +62,7 @@ class Nationality {
   // إنشاء جنسية جديدة
   static async create(newNationality, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -139,7 +139,7 @@ class Nationality {
   // تحديث جنسية
   static async update(nationalityCode, nationality, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -213,7 +213,7 @@ class Nationality {
   // حذف جنسية
   static async delete(nationalityCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -248,7 +248,7 @@ class Nationality {
   // البحث عن جنسيات
   static async search(searchTerm) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }

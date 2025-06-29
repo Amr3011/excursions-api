@@ -1,6 +1,6 @@
 // src/models/hotel.js
 const sql = require("mssql");
-const { poolPromise } = require("../config/db");
+const db = require("../config/db");
 
 class Hotel {
   constructor(hotel) {
@@ -17,7 +17,7 @@ class Hotel {
   // الحصول على جميع الفنادق
   static async getAll() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -39,7 +39,7 @@ class Hotel {
   // الحصول على فندق واحد بواسطة الكود
   static async findByCode(hotelCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -66,7 +66,7 @@ class Hotel {
   // إنشاء فندق جديد
   static async create(newHotel, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -144,7 +144,7 @@ class Hotel {
   // تحديث فندق
   static async update(hotelCode, hotel, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -229,7 +229,7 @@ class Hotel {
   // حذف فندق
   static async delete(hotelCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -263,7 +263,7 @@ class Hotel {
   // البحث عن فنادق
   static async search(searchTerm) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }

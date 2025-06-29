@@ -1,6 +1,6 @@
 // src/models/currency.js
 const sql = require("mssql");
-const { poolPromise } = require("../config/db");
+const db = require("../config/db");
 
 class Currency {
   constructor(currency) {
@@ -12,7 +12,7 @@ class Currency {
   // الحصول على جميع العملات
   static async getAll() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -34,7 +34,7 @@ class Currency {
   // الحصول على عملة واحدة بواسطة الكود
   static async findByCode(currencyCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -62,7 +62,7 @@ class Currency {
   // إنشاء عملة جديدة
   static async create(newCurrency, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -144,7 +144,7 @@ class Currency {
   // تحديث عملة
   static async update(currencyCode, currency, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -232,7 +232,7 @@ class Currency {
   // حذف عملة
   static async delete(currencyCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -271,7 +271,7 @@ class Currency {
   // البحث عن عملات
   static async search(searchTerm) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }

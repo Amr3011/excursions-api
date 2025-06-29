@@ -1,6 +1,6 @@
 // src/models/city.js
 const sql = require("mssql");
-const { poolPromise } = require("../config/db");
+const db = require("../config/db");
 
 class City {
   constructor(city) {
@@ -11,7 +11,8 @@ class City {
   // الحصول على جميع المدن
   static async getAll() {
     try {
-      const pool = await poolPromise;
+      // استخدام الطريقة المتوافقة مع Vercel
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -33,7 +34,7 @@ class City {
   // الحصول على مدينة واحدة بواسطة الكود
   static async findByCode(cityCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -60,7 +61,7 @@ class City {
   // إنشاء مدينة جديدة
   static async create(newCity, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -126,7 +127,7 @@ class City {
   // تحديث مدينة
   static async update(cityCode, city, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -187,7 +188,7 @@ class City {
   // حذف مدينة
   static async delete(cityCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -207,6 +208,21 @@ class City {
         };
       }
 
+      // التحقق من وجود طرق مرتبطة بالمدينة قبل الحذف
+      const roadCheckResult = await pool
+        .request()
+        .input("cityCode", sql.Int, cityCode).query(`
+          SELECT COUNT(*) AS roadCount FROM Road WHERE CityCode = @cityCode
+        `);
+
+      const roadCount = roadCheckResult.recordset[0].roadCount || 0;
+      if (roadCount > 0) {
+        return {
+          success: false,
+          error: `Cannot delete city: it is referenced by ${roadCount} roads`,
+        };
+      }
+
       await pool.request().input("cityCode", sql.Int, cityCode).query(`
           DELETE FROM City WHERE CityCode = @cityCode
         `);
@@ -221,7 +237,7 @@ class City {
   // البحث عن مدن
   static async search(searchTerm) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }

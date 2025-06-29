@@ -1,6 +1,6 @@
 // src/models/road.js
 const sql = require("mssql");
-const { poolPromise } = require("../config/db");
+const db = require("../config/db");
 
 class Road {
   constructor(road) {
@@ -13,7 +13,7 @@ class Road {
   // الحصول على جميع الطرق
   static async getAll() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -37,7 +37,7 @@ class Road {
   // الحصول على طريق واحد بواسطة الكود
   static async findByCode(cityCode, roadCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -68,7 +68,7 @@ class Road {
   // الحصول على الطرق حسب المدينة
   static async findByCity(cityCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -94,7 +94,7 @@ class Road {
   // إنشاء طريق جديد
   static async create(newRoad, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -203,7 +203,7 @@ class Road {
   // تحديث طريق
   static async update(cityCode, roadCode, road, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -302,7 +302,7 @@ class Road {
   // حذف طريق
   static async delete(cityCode, roadCode) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }
@@ -342,7 +342,7 @@ class Road {
   // البحث عن طرق
   static async search(searchTerm) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
       if (!pool) {
         return { success: false, error: "Database connection failed" };
       }

@@ -1,6 +1,6 @@
 // src/models/excursion.js
 const sql = require("mssql");
-const { poolPromise } = require("../config/db");
+const db = require("../config/db");
 
 class Excursion {
   constructor(excursion) {
@@ -31,7 +31,11 @@ class Excursion {
   // إنشاء رحلة جديدة
   static async create(newExcursion) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool
         .request()
         .input("voucherNo", sql.Numeric(10, 0), newExcursion.voucherNo)
@@ -79,7 +83,11 @@ class Excursion {
   // الحصول على جميع الرحلات
   static async getAll() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT 
           e.VoucherNo, e.VoucherDate, e.Name, n.NationalityName, e.Telephone, 
@@ -105,7 +113,11 @@ class Excursion {
   // الحصول على رحلة واحدة بواسطة رقم القسيمة
   static async findByVoucherNo(voucherNo) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool
         .request()
         .input("voucherNo", sql.Numeric(10, 0), voucherNo).query(`
@@ -139,7 +151,11 @@ class Excursion {
   // تحديث رحلة
   static async update(voucherNo, excursion, userName) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       await pool
         .request()
         .input("voucherNo", sql.Numeric(10, 0), voucherNo)
@@ -198,7 +214,11 @@ class Excursion {
   // حذف رحلة
   static async delete(voucherNo) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       await pool.request().input("voucherNo", sql.Numeric(10, 0), voucherNo)
         .query(`
           DELETE FROM Excursions WHERE VoucherNo = @voucherNo
@@ -214,7 +234,11 @@ class Excursion {
   // الحصول على قائمة الفنادق
   static async getHotels() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT HotelID, HotelName FROM Hotels ORDER BY HotelName
       `);
@@ -228,7 +252,11 @@ class Excursion {
   // الحصول على قائمة الجنسيات
   static async getNationalities() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT NationalityID, NationalityName FROM Nationalities ORDER BY NationalityName
       `);
@@ -242,7 +270,11 @@ class Excursion {
   // الحصول على قائمة العملات
   static async getCurrencies() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT CurrencyID, CurrencyName FROM Currencies ORDER BY CurrencyName
       `);
@@ -256,7 +288,11 @@ class Excursion {
   // الحصول على قائمة أنواع الرحلات
   static async getExcursionTypes() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT ExcursionID, ExcursionName FROM ExcursionTypes ORDER BY ExcursionName
       `);
@@ -270,7 +306,11 @@ class Excursion {
   // الحصول على قائمة العملاء
   static async getCustomers() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName
       `);
@@ -284,7 +324,11 @@ class Excursion {
   // البحث عن رحلات
   static async search(searchParams) {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       let query = `
         SELECT 
           e.VoucherNo, e.VoucherDate, e.Name, n.NationalityName, e.Telephone, 
@@ -353,7 +397,11 @@ class Excursion {
   // الحصول على رقم القسيمة التالي
   static async getNextVoucherNo() {
     try {
-      const pool = await poolPromise;
+      const pool = await db.createConnection();
+      if (!pool) {
+        return { success: false, error: "Database connection failed" };
+      }
+
       const result = await pool.request().query(`
         SELECT MAX(VoucherNo) AS MaxVoucherNo FROM Excursions
       `);
