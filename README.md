@@ -30,18 +30,6 @@ cd excursions-api
 ```bash
 npm install
 ```
-
-3. إعداد ملف `.env`:
-
-```
-PORT=5000
-DB_SERVER=your_db_server
-DB_NAME=your_db_name
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
-JWT_SECRET=your_jwt_secret
-```
-
 4. تشغيل الخادم:
 
 ```bash
