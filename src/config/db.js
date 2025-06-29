@@ -7,7 +7,7 @@ dotenv.config();
 const isVercel = process.env.VERCEL === "1";
 
 console.log("Environment:", isVercel ? "Vercel" : "Local");
-console.log("Date and time:", "2025-06-29 14:53:16");
+console.log("Date and time:", "2025-06-29 15:02:26");
 console.log("User:", "Amr3011");
 
 // تكوين قاعدة البيانات

@@ -5,8 +5,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "watch": "node watch.js"
+    "dev": "node watch.js",
+    "vercel-build": "node -e \"console.log('Building for Vercel...')\"",
+    "vercel-start": "node watch-vercel.js"
   },
   "engines": {
     "node": ">=14.0.0"
