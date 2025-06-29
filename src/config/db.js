@@ -1,43 +1,52 @@
-// src/config/db.js
 const sql = require("mssql");
 const dotenv = require("dotenv");
 
-// تحميل متغيرات البيئة
 dotenv.config();
 
-// تكوين الاتصال بقاعدة البيانات
+// تحديد ما إذا كان التطبيق يعمل على Vercel
+const isVercel = process.env.VERCEL === "1";
+
+// تكوين قاعدة البيانات بناءً على بيئة التشغيل
 const config = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  server: process.env.DB_SERVER,
-  port: parseInt(process.env.DB_PORT) || 1433,
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000,
-  },
+  user: process.env.DB_USER || "sa",
+  password: process.env.DB_PASSWORD || "YourPassword",
+  server: process.env.DB_SERVER || "localhost",
+  database: process.env.DB_NAME || "ExcursionsDB",
   options: {
-    encrypt: false, // تعديل هذه القيمة لتكون false
-    trustServerCertificate: true,
+    encrypt: isVercel ? true : process.env.DB_ENCRYPT === "true",
+    trustServerCertificate: !isVercel, // فقط في البيئة المحلية
     enableArithAbort: true,
   },
+  connectionTimeout: 30000, // زيادة مهلة الاتصال
+  requestTimeout: 30000, // زيادة مهلة الطلب
 };
 
-// إنشاء تجمع الاتصالات
-const poolPromise = new sql.ConnectionPool(config)
-  .connect()
-  .then((pool) => {
-    console.log("Connected to SQL Server successfully!");
+console.log("Environment:", isVercel ? "Vercel" : "Local");
+console.log("Database config:", {
+  user: config.user,
+  server: config.server,
+  database: config.database,
+  encrypt: config.options.encrypt,
+  trustServerCertificate: config.options.trustServerCertificate,
+});
+
+// وظيفة لإنشاء اتصال جديد
+const createConnection = async () => {
+  try {
+    const pool = await new sql.ConnectionPool(config).connect();
+    console.log("Connected to SQL Server successfully");
     return pool;
-  })
-  .catch((err) => {
-    console.error("Database Connection Failed! Bad Config:", err);
-    // عدم إنهاء التطبيق في حالة فشل الاتصال الأولي
+  } catch (err) {
+    console.error("Database Connection Failed:", err);
     return null;
-  });
+  }
+};
+
+// إنشاء مجمع اتصال واحد ليتم استخدامه في التطبيق
+const poolPromise = createConnection();
 
 module.exports = {
-  poolPromise,
   sql,
+  poolPromise,
+  createConnection, // تصدير وظيفة الاتصال لإعادة استخدامها عند الحاجة
 };

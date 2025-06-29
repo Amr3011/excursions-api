@@ -7,7 +7,7 @@
  * @returns {string} اسم المستخدم الحالي
  */
 const getCurrentUser = () => {
-  return "Amr3011C";
+  return "Amr3011";
 };
 
 /**
@@ -15,7 +15,7 @@ const getCurrentUser = () => {
  * @returns {string} التاريخ والوقت بتنسيق UTC YYYY-MM-DD HH:MM:SS
  */
 const getCurrentDateTime = () => {
-  return "2025-06-29 14:14:46";
+  return "2025-06-29 14:31:08";
 };
 
 module.exports = {
