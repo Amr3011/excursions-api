@@ -138,6 +138,24 @@ try {
   console.error("Failed to load nationality routes:", error.message);
 }
 
+// استيراد مسارات الفواتير بشكل آمن
+let invhdrRoutes;
+try {
+  const invhdrRoutesPath = path.join(__dirname, "routes", "invhdrs.js");
+  console.log(`Trying to load invhdr routes from: ${invhdrRoutesPath}`);
+
+  // التحقق من وجود الملف
+  const fs = require("fs");
+  if (fs.existsSync(invhdrRoutesPath)) {
+    invhdrRoutes = require("./routes/invhdrs");
+    console.log("InvHdr routes loaded successfully");
+  } else {
+    console.error(`InvHdr routes file does not exist at: ${invhdrRoutesPath}`);
+  }
+} catch (error) {
+  console.error("Failed to load invhdr routes:", error.message);
+}
+
 // عرض معلومات المستخدم الحالي والتاريخ عند بدء التشغيل
 console.log(`Server started by ${getCurrentUser()} at ${getCurrentDateTime()}`);
 
@@ -177,6 +195,13 @@ if (currencyRoutes) {
   console.log("Currency routes registered successfully");
 }
 
+// تسجيل مسارات الفواتير إذا تم تحميلها بنجاح
+if (invhdrRoutes) {
+  console.log("Registering invhdr routes...");
+  app.use("/api/invhdrs", invhdrRoutes);
+  console.log("InvHdr routes registered successfully");
+}
+
 // مسار اختبار
 app.get("/", (req, res) => {
   res.json({
@@ -189,7 +214,7 @@ app.get("/", (req, res) => {
 app.use(errorHandler);
 
 // تعيين المنفذ وبدء تشغيل الخادم
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
