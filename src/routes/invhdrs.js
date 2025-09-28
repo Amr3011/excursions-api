@@ -7,6 +7,9 @@ const {
   getInvHdr,
   getInvHdrsByCustomer,
   getInvHdrsByDate,
+  getInvHdrsByDateRange,
+  getInvHdrsByPeriod,
+  getInvHdrsByDateRangeGrouped,
   createInvHdr,
   updateInvHdr,
   deleteInvHdr,
@@ -16,6 +19,11 @@ const {
 // @route   GET /api/invhdrs
 // @access  Public
 router.get("/", getAllInvHdrs);
+
+// @desc    الحصول على الفواتير بفترة زمنية (من تاريخ إلى تاريخ)
+// @route   GET /api/invhdrs/range?fromDate=2025-01-01&toDate=2025-12-31
+// @access  Public
+router.get("/range", getInvHdrsByDateRange);
 
 // @desc    الحصول على فاتورة واحدة بواسطة رقم الفاتورة
 // @route   GET /api/invhdrs/:invNo
@@ -28,9 +36,19 @@ router.get("/:invNo", getInvHdr);
 router.get("/customer/:customerCode", getInvHdrsByCustomer);
 
 // @desc    الحصول على الفواتير بواسطة تاريخ الحركة
-// @route   GET /api/invhdrs/date/:date
+// @route   POST /api/invhdrs/date
 // @access  Public
-router.get("/date/:date", getInvHdrsByDate);
+router.post("/date", getInvHdrsByDate);
+
+// @desc    الحصول على الفواتير التي تشمل فترتها التاريخ المحدد
+// @route   POST /api/invhdrs/period
+// @access  Public
+router.post("/period", getInvHdrsByPeriod);
+
+// @desc    الحصول على الفواتير مجمعة حسب BoatCode في فترة زمنية
+// @route   POST /api/invhdrs/grouped
+// @access  Public
+router.post("/grouped", getInvHdrsByDateRangeGrouped);
 
 // @desc    إنشاء فاتورة جديدة
 // @route   POST /api/invhdrs

@@ -49,7 +49,15 @@ exports.getInvHdrsByCustomer = async (req, res, next) => {
 // الحصول على الفواتير بواسطة تاريخ الحركة
 exports.getInvHdrsByDate = async (req, res, next) => {
   try {
-    const { date } = req.params;
+    const { date } = req.body;
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        error: "Date is required in request body",
+      });
+    }
+
     const result = await InvHdr.findByTrafficDate(date);
 
     if (!result.success) {
@@ -142,6 +150,101 @@ exports.deleteInvHdr = async (req, res, next) => {
     }
 
     res.status(200).json({ success: true, message: result.message });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// الحصول على الفواتير بفترة تاريخية محددة
+exports.getInvHdrsByDateRange = async (req, res, next) => {
+  try {
+    const { fromDate, toDate } = req.query;
+
+    if (!fromDate || !toDate) {
+      return res.status(400).json({
+        success: false,
+        error: "FromDate and ToDate are required in query parameters",
+      });
+    }
+
+    const result = await InvHdr.findByDateRange(fromDate, toDate);
+
+    if (!result.success) {
+      return res.status(500).json({ success: false, error: result.error });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      count: result.data.length,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// الحصول على الفواتير الى فترتها تشمل التاريخ المحدد
+exports.getInvHdrsByPeriod = async (req, res, next) => {
+  try {
+    const { FromDate, ToDate } = req.body;
+
+    if (!FromDate || !ToDate) {
+      return res.status(400).json({
+        success: false,
+        error: "FromDate and ToDate are required in request body",
+      });
+    }
+
+    const result = await InvHdr.findByDateRange(FromDate, ToDate);
+
+    if (!result.success) {
+      return res.status(500).json({ success: false, error: result.error });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      count: result.data.length,
+      dateRange: { FromDate, ToDate },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// الحصول على الفواتير مجمعة حسب BoatCode في فترة زمنية
+exports.getInvHdrsByDateRangeGrouped = async (req, res, next) => {
+  try {
+    const { FromDate, ToDate } = req.body;
+
+    if (!FromDate || !ToDate) {
+      return res.status(400).json({
+        success: false,
+        error: "FromDate and ToDate are required in request body",
+      });
+    }
+
+    const result = await InvHdr.findByDateRangeGroupedByBoat(FromDate, ToDate);
+
+    if (!result.success) {
+      return res.status(500).json({ success: false, error: result.error });
+    }
+
+    // حساب الإجمالي العام
+    const grandTotal = result.data.reduce(
+      (sum, boat) => sum + (boat.TotalAmount || 0),
+      0
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      summary: {
+        totalBoats: result.data.length,
+        grandTotal: grandTotal,
+        dateRange: { FromDate, ToDate },
+      },
+    });
   } catch (err) {
     next(err);
   }
