@@ -351,12 +351,12 @@ class InvHdr {
           cur.CurrencyName,
           COUNT(*) as InvoiceCount,
           SUM(ih.GTotal) as TotalAmount,
-          MIN(ih.FromDate) as FirstDate,
-          MAX(ih.ToDate) as LastDate
+          MIN(ih.TrafficDate) as FirstDate,
+          MAX(ih.TrafficDate) as LastDate
         FROM InvHdr ih
         LEFT JOIN Boat b ON ih.BoatCode = b.BoatCode
         LEFT JOIN Currency cur ON ih.Currency = cur.CurrencyCode
-        WHERE ih.FromDate >= @FromDate AND ih.ToDate <= @ToDate
+        WHERE ih.TrafficDate >= @FromDate AND ih.TrafficDate <= @ToDate
         GROUP BY ih.BoatCode, b.BoatName, ih.Currency, cur.CurrencyName
         ORDER BY SUM(ih.GTotal) DESC
       `;
@@ -370,7 +370,7 @@ class InvHdr {
           ih.Currency,
           ih.InvNo
         FROM InvHdr ih
-        WHERE ih.FromDate >= @FromDate AND ih.ToDate <= @ToDate
+        WHERE ih.TrafficDate >= @FromDate AND ih.TrafficDate <= @ToDate
         ORDER BY ih.BoatCode, ih.Currency, ih.InvNo
       `;
       const request2 = pool.request();
