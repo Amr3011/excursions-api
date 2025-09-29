@@ -156,6 +156,32 @@ try {
   console.error("Failed to load invhdr routes:", error.message);
 }
 
+// استيراد مسارات الرحلات المجمعة بشكل آمن
+let excursionsGroupedRoutes;
+try {
+  const excursionsGroupedRoutesPath = path.join(
+    __dirname,
+    "routes",
+    "excursionsGrouped.js"
+  );
+  console.log(
+    `Trying to load excursionsGrouped routes from: ${excursionsGroupedRoutesPath}`
+  );
+
+  // التحقق من وجود الملف
+  const fs = require("fs");
+  if (fs.existsSync(excursionsGroupedRoutesPath)) {
+    excursionsGroupedRoutes = require("./routes/excursionsGrouped");
+    console.log("ExcursionsGrouped routes loaded successfully");
+  } else {
+    console.error(
+      `ExcursionsGrouped routes file does not exist at: ${excursionsGroupedRoutesPath}`
+    );
+  }
+} catch (error) {
+  console.error("Failed to load excursionsGrouped routes:", error.message);
+}
+
 // عرض معلومات المستخدم الحالي والتاريخ عند بدء التشغيل
 console.log(`Server started by ${getCurrentUser()} at ${getCurrentDateTime()}`);
 
@@ -200,6 +226,13 @@ if (invhdrRoutes) {
   console.log("Registering invhdr routes...");
   app.use("/api/invhdrs", invhdrRoutes);
   console.log("InvHdr routes registered successfully");
+}
+
+// تسجيل مسارات الرحلات المجمعة إذا تم تحميلها بنجاح
+if (excursionsGroupedRoutes) {
+  console.log("Registering excursionsGrouped routes...");
+  app.use("/api/excursionsGrouped", excursionsGroupedRoutes);
+  console.log("ExcursionsGrouped routes registered successfully");
 }
 
 // مسار اختبار
