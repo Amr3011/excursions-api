@@ -186,13 +186,14 @@ exports.getInvHdrsByDateRange = async (req, res, next) => {
 // الحصول على الفواتير الى فترتها تشمل التاريخ المحدد
 exports.getInvHdrsByPeriod = async (req, res, next) => {
   try {
-    const { FromDate, ToDate } = req.body;
+    let { FromDate, ToDate } = req.body;
 
-    if (!FromDate || !ToDate) {
-      return res.status(400).json({
-        success: false,
-        error: "FromDate and ToDate are required in request body",
-      });
+    // إذا لم يتم تحديد التواريخ، استخدم نطاق شامل
+    if (!FromDate) {
+      FromDate = "1900-01-01"; // تاريخ قديم جداً
+    }
+    if (!ToDate) {
+      ToDate = "2099-12-31"; // تاريخ بعيد جداً
     }
 
     const result = await InvHdr.findByDateRange(FromDate, ToDate);
@@ -215,9 +216,17 @@ exports.getInvHdrsByPeriod = async (req, res, next) => {
 // الحصول على الفواتير مجمعة حسب BoatCode في فترة زمنية
 exports.getInvHdrsByDateRangeGrouped = async (req, res, next) => {
   try {
-    const { FromDate, ToDate } = req.body;
+    let { FromDate, ToDate } = req.body;
 
-    if (!FromDate || !ToDate) {
+    // إذا لم يتم تحديد التواريخ، استخدم نطاق شامل
+    if (!FromDate) {
+      FromDate = "1900-01-01"; // تاريخ قديم جداً
+    }
+    if (!ToDate) {
+      ToDate = "2099-12-31"; // تاريخ بعيد جداً
+    }
+
+    if (false) {
       return res.status(400).json({
         success: false,
         error: "FromDate and ToDate are required in request body",
@@ -230,11 +239,12 @@ exports.getInvHdrsByDateRangeGrouped = async (req, res, next) => {
       return res.status(500).json({ success: false, error: result.error });
     }
 
-    // حساب الإجمالي العام
-    const grandTotal = result.data.reduce(
-      (sum, boat) => sum + (boat.TotalAmount || 0),
-      0
-    );
+    // حساب الإجمالي العام مع تدوير الرقم
+    const grandTotal =
+      Math.round(
+        result.data.reduce((sum, boat) => sum + (boat.TotalAmount || 0), 0) *
+          100
+      ) / 100;
 
     res.status(200).json({
       success: true,

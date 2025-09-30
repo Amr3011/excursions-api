@@ -87,13 +87,14 @@ exports.getExcursionsByDateRange = async (req, res, next) => {
 // الحصول على السجلات بفترة تاريخية محددة
 exports.getExcursionsByPeriod = async (req, res, next) => {
   try {
-    const { FromDate, ToDate } = req.body;
+    let { FromDate, ToDate } = req.body;
 
-    if (!FromDate || !ToDate) {
-      return res.status(400).json({
-        success: false,
-        error: "FromDate and ToDate are required in request body",
-      });
+    // إذا لم يتم تحديد التواريخ، استخدم نطاق شامل
+    if (!FromDate) {
+      FromDate = "1900-01-01"; // تاريخ قديم جداً
+    }
+    if (!ToDate) {
+      ToDate = "2099-12-31"; // تاريخ بعيد جداً
     }
 
     const result = await Excursions.findByDateRangeGrouped(FromDate, ToDate);
@@ -102,12 +103,31 @@ exports.getExcursionsByPeriod = async (req, res, next) => {
       return res.status(500).json({ success: false, error: result.error });
     }
 
+    // حساب الإجماليات العامة مع تدوير الأرقام
+    const totalPrice =
+      Math.round(
+        result.data.reduce((sum, item) => sum + (item.Price || 0), 0) * 100
+      ) / 100;
+    const totalPaid =
+      Math.round(
+        result.data.reduce((sum, item) => sum + (item.Paid || 0), 0) * 100
+      ) / 100;
+    const totalUnpaid =
+      Math.round(
+        result.data.reduce((sum, item) => sum + (item.Unpaid || 0), 0) * 100
+      ) / 100;
+
     res.status(200).json({
       success: true,
       data: result.data,
       count: result.data.length,
       dateRange: { FromDate, ToDate },
-      summary: result.summary,
+      summary: {
+        totalPrice: totalPrice,
+        totalPaid: totalPaid,
+        totalUnpaid: totalUnpaid,
+        grandTotal: totalPaid + totalUnpaid,
+      },
     });
   } catch (err) {
     next(err);
@@ -117,9 +137,17 @@ exports.getExcursionsByPeriod = async (req, res, next) => {
 // الحصول على السجلات مجمعة حسب HotelCode في فترة زمنية
 exports.getExcursionsByDateRangeGrouped = async (req, res, next) => {
   try {
-    const { FromDate, ToDate } = req.body;
+    let { FromDate, ToDate } = req.body;
 
-    if (!FromDate || !ToDate) {
+    // إذا لم يتم تحديد التواريخ، استخدم نطاق شامل
+    if (!FromDate) {
+      FromDate = "1900-01-01"; // تاريخ قديم جداً
+    }
+    if (!ToDate) {
+      ToDate = "2099-12-31"; // تاريخ بعيد جداً
+    }
+
+    if (false) {
       return res.status(400).json({
         success: false,
         error: "FromDate and ToDate are required in request body",
@@ -135,19 +163,22 @@ exports.getExcursionsByDateRangeGrouped = async (req, res, next) => {
       return res.status(500).json({ success: false, error: result.error });
     }
 
-    // حساب الإجماليات العامة
-    const grandTotalPrice = result.data.reduce(
-      (sum, hotel) => sum + (hotel.TotalPrice || 0),
-      0
-    );
-    const grandTotalPaid = result.data.reduce(
-      (sum, hotel) => sum + (hotel.TotalPaid || 0),
-      0
-    );
-    const grandTotalUnpaid = result.data.reduce(
-      (sum, hotel) => sum + (hotel.TotalUnpaid || 0),
-      0
-    );
+    // حساب الإجماليات العامة مع تدوير الأرقام
+    const grandTotalPrice =
+      Math.round(
+        result.data.reduce((sum, hotel) => sum + (hotel.TotalPrice || 0), 0) *
+          100
+      ) / 100;
+    const grandTotalPaid =
+      Math.round(
+        result.data.reduce((sum, hotel) => sum + (hotel.TotalPaid || 0), 0) *
+          100
+      ) / 100;
+    const grandTotalUnpaid =
+      Math.round(
+        result.data.reduce((sum, hotel) => sum + (hotel.TotalUnpaid || 0), 0) *
+          100
+      ) / 100;
 
     res.status(200).json({
       success: true,
@@ -157,6 +188,7 @@ exports.getExcursionsByDateRangeGrouped = async (req, res, next) => {
         grandTotalPrice: grandTotalPrice,
         grandTotalPaid: grandTotalPaid,
         grandTotalUnpaid: grandTotalUnpaid,
+        grandTotal: grandTotalPaid + grandTotalUnpaid,
         dateRange: { FromDate, ToDate },
       },
     });
